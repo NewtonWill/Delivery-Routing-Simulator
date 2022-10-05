@@ -108,4 +108,4 @@ deliveryalgo(truck2, truck2.packagesLoaded, distanceList)
 
 #print(truck2.packagesLoaded)
 
-print(Package.Get_Package(hashTable., packageTable))
+#print(Package.Get_Package(hashTable., packageTable))
