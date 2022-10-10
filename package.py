@@ -20,10 +20,11 @@ class Package:
         return HashT.search(packageID)
 
     def Get_DestID(packageID, HashT):
-        return (HashT.search(packageID)).destID
+        return (HashT.search(packageID)).destId
 
-    def Get_Distance(originID, destID, dTable):
-        return dTable[originID, destID]
-        # dTable is always distanceList in main.py
-        # destID is found via Get_DestID above using packageID IE Get_DestID(*packageID*)
-        # originID is from the truck object via get_PositionID(*truckID*)
+    # def Get_Distance(originID, destID, dTable):
+    #     return dTable[originID, destID]
+    #     # dTable is always distanceList in main.py
+    #     # destID is found via Get_DestID above using packageID IE Get_DestID(*packageID*)
+    #     # originID is from the truck object via get_PositionID(*truckID*)
+    #     # transferred to main.py

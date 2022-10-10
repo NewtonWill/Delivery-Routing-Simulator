@@ -9,6 +9,13 @@ import csv
 packageTable = hashTable.ChainingHashTable(40)
 
 
+def Get_Distance(originID, destID, dTable):
+    return dTable[originID][destID]
+    # dTable is always distanceList in main.py
+    # destID is found via Get_DestID above using packageID IE Get_DestID(*packageID*)
+    # originID is from the truck object via get_PositionID(*truckID*)
+    # Taken from package.py (temp?)
+
 def loadPackageData():
     with open('packages.csv') as packageList:
         packageData = csv.reader(packageList, delimiter=',')
@@ -33,11 +40,30 @@ def loadPackageData():
             packageTable.insert(pID, p)
 
 def deliveryalgo(truck, packagelist, dList):
-    minDist = 0
-    for truck.packagesLoaded in packagelist:
-        print(truck.packagesLoaded.id)
-        i = truck.packagesLoaded.id
-        #print(Package.Get_Distance(truck.get_PositionID(), Package.Get_DestID(i, packageTable), dList))
+    deliveredPackages = []
+    while len(packagelist) > 0:
+        minDist = float(100)
+        closest = None
+        for truck.packagesLoaded in packagelist:
+            #print("--------------------------------------------------------------------------")
+            #print("Package:", truck.packagesLoaded.id)
+            i = truck.packagesLoaded.id
+            #print("Current Truck Position:", truck.get_PositionID())
+            #print("Package Destination:", Package.Get_DestID(i, packageTable))
+            currentDist = float(Get_Distance(int(truck.get_PositionID()), int(Package.Get_DestID(i, packageTable)), dList))
+            #print("CurrentDist:", currentDist)
+            if currentDist < minDist:
+                minDist = currentDist
+                closest = i
+            #print("Closest: Package", closest, "|| Distance: ", minDist)
+        truck.currentPosition = Package.Get_DestID(closest, packageTable)
+        truck.currentMileage = truck.currentMileage + minDist
+        deliveredPackages.append(closest)
+        print("////////////////////////////////////////////////////////////////")
+        print("Delivering package (", closest, ") Current truck mileage: ", truck.currentMileage)
+        print("Delivered Packages: ", deliveredPackages)
+        print("////////////////////////////////////////////////////////////////")
+        packagelist.remove(Package.Get_Package(closest, packageTable))
 
 
 
@@ -95,17 +121,23 @@ truck3 = Truck(3, [
                          ],
                      0)
 
-print(packageTable.search(1))
+# print(packageTable.search(1))
+#
+# print(truck1)
+# print(truck2)
+# print(truck3)
+#
+# print("Total truck mileage: %s" %
+#       (truck1.currentMileage + truck2.currentMileage + truck3.currentMileage))
 
-print(truck1)
-print(truck2)
-print(truck3)
-
-print("Total truck mileage: %s" %
-      (truck1.currentMileage + truck2.currentMileage + truck3.currentMileage))
-
+deliveryalgo(truck1, truck1.packagesLoaded, distanceList)
 deliveryalgo(truck2, truck2.packagesLoaded, distanceList)
+deliveryalgo(truck3, truck3.packagesLoaded, distanceList)
 
+print("\n Truck 1 Miles: ", truck1.currentMileage)
+print("Truck 2 Miles: ", truck2.currentMileage)
+print("Truck 3 Miles: ", truck3.currentMileage)
+print("\n Total truck miles: ", truck1.currentMileage + truck2.currentMileage + truck3.currentMileage)
 #print(truck2.packagesLoaded)
 
 #print(Package.Get_Package(hashTable., packageTable))
