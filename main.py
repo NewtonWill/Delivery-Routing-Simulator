@@ -5,6 +5,7 @@ import distance
 from package import Package
 import hashTable
 import csv
+import time
 
 packageTable = hashTable.ChainingHashTable(40)
 
@@ -14,7 +15,6 @@ def Get_Distance(originID, destID, dTable):
     # dTable is always distanceList in main.py
     # destID is found via Get_DestID above using packageID IE Get_DestID(*packageID*)
     # originID is from the truck object via get_PositionID(*truckID*)
-    # Taken from package.py (temp?)
 
 def loadPackageData():
     with open('packages.csv') as packageList:
@@ -33,11 +33,14 @@ def loadPackageData():
 
             # package object
             p = Package(pID, pAddress, pCity, pState, pZip,
-                                pDeadline, pWeight, pDestId, pSpecNotes)
+                                pDeadline, pWeight, pDestId, pSpecNotes, "At the Hub")
             #print(p)
 
             # insert it into the hash table
             packageTable.insert(pID, p)
+
+def calculateTime(miles):
+    return miles/18
 
 def deliveryalgo(truck, packagelist, dList):
     deliveredPackages = []
@@ -63,6 +66,8 @@ def deliveryalgo(truck, packagelist, dList):
         print("Delivering package (", closest, ") Current truck mileage: ", truck.currentMileage)
         print("Delivered Packages: ", deliveredPackages)
         print("////////////////////////////////////////////////////////////////")
+        Package.Get_Package(closest, packageTable).deliveryStatus = "Delivered at ", \
+                                                                    calculateTime(truck.currentMileage), "Hours"
         packagelist.remove(Package.Get_Package(closest, packageTable))
 
 
@@ -134,10 +139,13 @@ deliveryalgo(truck1, truck1.packagesLoaded, distanceList)
 deliveryalgo(truck2, truck2.packagesLoaded, distanceList)
 deliveryalgo(truck3, truck3.packagesLoaded, distanceList)
 
-print("\n Truck 1 Miles: ", truck1.currentMileage)
-print("Truck 2 Miles: ", truck2.currentMileage)
-print("Truck 3 Miles: ", truck3.currentMileage)
-print("\n Total truck miles: ", truck1.currentMileage + truck2.currentMileage + truck3.currentMileage)
+print("\nTruck 1 Miles: ", truck1.currentMileage, "Truck 1 Hours: ", calculateTime(truck1.currentMileage))
+print("Truck 2 Miles: ", truck2.currentMileage, "Truck 2 Hours: ", calculateTime(truck2.currentMileage))
+print("Truck 3 Miles: ", truck3.currentMileage, "Truck 3 Hours: ", calculateTime(truck3.currentMileage))
+print("\nTotal truck miles: ", truck1.currentMileage + truck2.currentMileage + truck3.currentMileage)
+
+for i in range(41):
+    print(Package.Get_Package(i, packageTable))
 #print(truck2.packagesLoaded)
 
 #print(Package.Get_Package(hashTable., packageTable))
