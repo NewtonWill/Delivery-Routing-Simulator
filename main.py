@@ -68,10 +68,8 @@ def deliveryalgo(truck, packagelist, dList):
         # print("Delivering package (", closest, ") Current truck mileage: ", truck.currentMileage)
         # print("Delivered Packages: ", deliveredPackages)
         # print("////////////////////////////////////////////////////////////////")
-        new = (ctTime + datetime.timedelta(hours=calculateTime(truck.currentMileage)))
-        print(new.strftime('%H, %M, %S'))
         Package.Get_Package(closest, packageTable).deliveryStatus =\
-            "Delivered at " + (ctTime + datetime.timedelta(hours=calculateTime(truck.currentMileage))).strftime("%H, %M, %S")
+            "Delivered at " + str(ctTime + datetime.timedelta(hours=calculateTime(truck.currentMileage)))
         packagelist.remove(Package.Get_Package(closest, packageTable))
 
 
