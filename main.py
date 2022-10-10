@@ -1,11 +1,9 @@
-#import Truck
 from Truck import Truck
 import distance
-#import package
 from package import Package
 import hashTable
 import csv
-import time
+import datetime
 
 packageTable = hashTable.ChainingHashTable(40)
 
@@ -40,10 +38,14 @@ def loadPackageData():
             packageTable.insert(pID, p)
 
 def calculateTime(miles):
-    return miles/18
+    return round(miles/18, 3)
 
 def deliveryalgo(truck, packagelist, dList):
     deliveredPackages = []
+    ctTime = datetime.timedelta(hours=8)
+    if truck.id == 2:
+        ctTime = ctTime + datetime.timedelta(hours=1, minutes=5)
+    print(ctTime)
     while len(packagelist) > 0:
         minDist = float(100)
         closest = None
@@ -60,14 +62,16 @@ def deliveryalgo(truck, packagelist, dList):
                 closest = i
             #print("Closest: Package", closest, "|| Distance: ", minDist)
         truck.currentPosition = Package.Get_DestID(closest, packageTable)
-        truck.currentMileage = truck.currentMileage + minDist
+        truck.currentMileage = round(truck.currentMileage + minDist, 1)
         deliveredPackages.append(closest)
-        print("////////////////////////////////////////////////////////////////")
-        print("Delivering package (", closest, ") Current truck mileage: ", truck.currentMileage)
-        print("Delivered Packages: ", deliveredPackages)
-        print("////////////////////////////////////////////////////////////////")
-        Package.Get_Package(closest, packageTable).deliveryStatus = "Delivered at ", \
-                                                                    calculateTime(truck.currentMileage), "Hours"
+        # print("////////////////////////////////////////////////////////////////")
+        # print("Delivering package (", closest, ") Current truck mileage: ", truck.currentMileage)
+        # print("Delivered Packages: ", deliveredPackages)
+        # print("////////////////////////////////////////////////////////////////")
+        new = (ctTime + datetime.timedelta(hours=calculateTime(truck.currentMileage)))
+        print(new.strftime('%H, %M, %S'))
+        Package.Get_Package(closest, packageTable).deliveryStatus =\
+            "Delivered at " + (ctTime + datetime.timedelta(hours=calculateTime(truck.currentMileage))).strftime("%H, %M, %S")
         packagelist.remove(Package.Get_Package(closest, packageTable))
 
 
@@ -126,26 +130,16 @@ truck3 = Truck(3, [
                          ],
                      0)
 
-# print(packageTable.search(1))
-#
-# print(truck1)
-# print(truck2)
-# print(truck3)
-#
-# print("Total truck mileage: %s" %
-#       (truck1.currentMileage + truck2.currentMileage + truck3.currentMileage))
-
 deliveryalgo(truck1, truck1.packagesLoaded, distanceList)
 deliveryalgo(truck2, truck2.packagesLoaded, distanceList)
 deliveryalgo(truck3, truck3.packagesLoaded, distanceList)
 
-print("\nTruck 1 Miles: ", truck1.currentMileage, "Truck 1 Hours: ", calculateTime(truck1.currentMileage))
-print("Truck 2 Miles: ", truck2.currentMileage, "Truck 2 Hours: ", calculateTime(truck2.currentMileage))
-print("Truck 3 Miles: ", truck3.currentMileage, "Truck 3 Hours: ", calculateTime(truck3.currentMileage))
-print("\nTotal truck miles: ", truck1.currentMileage + truck2.currentMileage + truck3.currentMileage)
+print("\nTruck 1 Miles: ", truck1.currentMileage, "\nTruck 1 Hours: ", calculateTime(truck1.currentMileage))
+print("\nTruck 2 Miles: ", truck2.currentMileage, "\nTruck 2 Hours: ", calculateTime(truck2.currentMileage))
+print("\nTruck 3 Miles: ", truck3.currentMileage, "\nTruck 3 Hours: ", calculateTime(truck3.currentMileage))
+print("\nTotal truck miles: ", round(truck1.currentMileage + truck2.currentMileage + truck3.currentMileage, 2))
 
 for i in range(41):
     print(Package.Get_Package(i, packageTable))
-#print(truck2.packagesLoaded)
 
 #print(Package.Get_Package(hashTable., packageTable))
