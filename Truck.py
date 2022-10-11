@@ -1,9 +1,12 @@
+import datetime
+
 class Truck:
     def __init__(self, id, packagesLoaded, currentPosition):
         self.id = id
         self.packagesLoaded = packagesLoaded
         self.currentPosition = currentPosition
         self.currentMileage = 0
+        self.currentTime = datetime.timedelta(hours=8)
 
     def __str__(self):
         return "Truck #%s // Packages: %s // Current Position ID: %s // Current Mileage: %s" % \

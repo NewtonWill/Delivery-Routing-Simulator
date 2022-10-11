@@ -4,15 +4,56 @@ from package import Package
 import hashTable
 import csv
 import datetime
+import time
 
 packageTable = hashTable.ChainingHashTable(40)
 
+
+def checkForDdl(): #Check for package deadline
+    for i in range(41):
+        if i > 0:
+            print("Package: ", str(Package.Get_Package(i, packageTable).id))
+            if Package.Get_Package(i, packageTable).deadline == "EOD":
+                print("Deadline: EOD, No delivery constraint")
+                print("Delivery Time:", str(Package.Get_Package(i, packageTable).deadline))
+                prGreen("Package Deadline Met: (No Deadline Constraint)")  # Ignore packages with no deadline
+            else:
+                this = Package.Get_Package(i, packageTable).deadline
+                words = this.split(':')
+                words2 = words[1].split(' ')
+                dline = datetime.timedelta(hours= AMPM(words2[1], int(words[0])), minutes= int(words2[0]))
+                print("Deadline:", dline)
+                stat = Package.Get_Package(i, packageTable).deliveryStatus
+                status = stat.split(' ')
+                deliverytime = status[2].split(":")
+                truedeliverytime = datetime.timedelta(hours= int(deliverytime[0]), minutes= int(deliverytime[1]))
+                print("Delivery Time:", truedeliverytime)
+                if truedeliverytime > dline:
+                    prRed("Delivery Deadline Error: Delivery time is past deadline")
+                else:
+                    prGreen("Package Deadline Met")
+
+
+def AMPM(ampm, hour):
+    if ampm == 'AM':
+        return hour
+    if ampm == 'PM':
+        return hour+12
 
 def Get_Distance(originID, destID, dTable):
     return dTable[originID][destID]
     # dTable is always distanceList in main.py
     # destID is found via Get_DestID above using packageID IE Get_DestID(*packageID*)
     # originID is from the truck object via get_PositionID(*truckID*)
+
+def prRed(skk): print("\033[91m {}\033[00m" .format(skk))
+def prGreen(skk): print("\033[92m {}\033[00m" .format(skk))
+def prYellow(skk): print("\033[93m {}\033[00m" .format(skk))
+def prLightPurple(skk): print("\033[94m {}\033[00m" .format(skk))
+def prPurple(skk): print("\033[95m {}\033[00m" .format(skk))
+def prCyan(skk): print("\033[96m {}\033[00m" .format(skk))
+def prLightGray(skk): print("\033[97m {}\033[00m" .format(skk))
+def prBlack(skk): print("\033[98m {}\033[00m" .format(skk))
 
 def loadPackageData():
     with open('packages.csv') as packageList:
@@ -40,38 +81,57 @@ def loadPackageData():
 def calculateTime(miles):
     return round(miles/18, 3)
 
+def printDeadlines():
+    for i in range(41):
+        if i > 0:
+            if Package.Get_Package(i, packageTable).deadline == "EOD":
+                print("Package ID: " + str(i) + "\t\tDeadline: " + str(
+                    Package.Get_Package(i, packageTable).deadline) + "\t\t\t" + str(
+                    Package.Get_Package(i, packageTable).deliveryStatus))
+            else:
+                print("Package ID: " + str(i) + "\t\tDeadline: " + str(
+                    Package.Get_Package(i, packageTable).deadline) + "\t\t" + str(
+                    Package.Get_Package(i, packageTable).deliveryStatus))
+
+
 def deliveryalgo(truck, packagelist, dList):
+    prPurple("Truck: " + str(truck.id))
+    prPurple("%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%")
     deliveredPackages = []
-    ctTime = datetime.timedelta(hours=8)
-    if truck.id == 2:
-        ctTime = ctTime + datetime.timedelta(hours=1, minutes=5)
-    print(ctTime)
+    print("Truck " + str(truck.id) + " Starting Time: " + str(truck.currentTime))
     while len(packagelist) > 0:
         minDist = float(100)
         closest = None
         for truck.packagesLoaded in packagelist:
-            #print("--------------------------------------------------------------------------")
-            #print("Package:", truck.packagesLoaded.id)
+            prCyan("--------------------------------------------------------------------------")
+            print("Package:", truck.packagesLoaded.id)
             i = truck.packagesLoaded.id
-            #print("Current Truck Position:", truck.get_PositionID())
-            #print("Package Destination:", Package.Get_DestID(i, packageTable))
+            print("Current Truck Position:", truck.get_PositionID())
+            print("Package Destination:", Package.Get_DestID(i, packageTable))
             currentDist = float(Get_Distance(int(truck.get_PositionID()), int(Package.Get_DestID(i, packageTable)), dList))
-            #print("CurrentDist:", currentDist)
+            print("CurrentDist:", currentDist)
             if currentDist < minDist:
                 minDist = currentDist
                 closest = i
-            #print("Closest: Package", closest, "|| Distance: ", minDist)
+            print("Closest: Package", closest, "|| Distance: ", minDist)
         truck.currentPosition = Package.Get_DestID(closest, packageTable)
         truck.currentMileage = round(truck.currentMileage + minDist, 1)
+        truck.currentTime = truck.currentTime + datetime.timedelta(hours=calculateTime(minDist))
         deliveredPackages.append(closest)
-        # print("////////////////////////////////////////////////////////////////")
-        # print("Delivering package (", closest, ") Current truck mileage: ", truck.currentMileage)
-        # print("Delivered Packages: ", deliveredPackages)
-        # print("////////////////////////////////////////////////////////////////")
-        Package.Get_Package(closest, packageTable).deliveryStatus =\
-            "Delivered at " + str(ctTime + datetime.timedelta(hours=calculateTime(truck.currentMileage)))
+        prYellow("//////////////////////////////////////////////////////////////////////////")
+        print("Delivering package (", closest, ")\nCurrent truck mileage: ", truck.currentMileage)
+        print("Current time: ", truck.currentTime)
+        print("Delivered Packages: ", deliveredPackages)
+        prYellow("//////////////////////////////////////////////////////////////////////////")
+        prRed("\n+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++")
+        Package.Get_Package(closest, packageTable).deliveryStatus = "Delivered at " + str(truck.currentTime)
         packagelist.remove(Package.Get_Package(closest, packageTable))
-
+    if truck.id == 3:
+        #return to hub to launch truck 2
+        returnDist = float(Get_Distance(int(truck.currentPosition), 0, distanceList))
+        truck.currentTime = truck.currentTime + datetime.timedelta(hours=calculateTime(returnDist))
+        truck.currentMileage = round(truck.currentMileage + returnDist, 1)
+        truck.currentPosition = 0
 
 
 loadPackageData() #Do Above
@@ -129,15 +189,24 @@ truck3 = Truck(3, [
                      0)
 
 deliveryalgo(truck1, truck1.packagesLoaded, distanceList)
-deliveryalgo(truck2, truck2.packagesLoaded, distanceList)
+
 deliveryalgo(truck3, truck3.packagesLoaded, distanceList)
 
+truck2.currentTime = truck3.currentTime  # driver returns to hub and switches to truck 2
+deliveryalgo(truck2, truck2.packagesLoaded, distanceList)
+
+
 print("\nTruck 1 Miles: ", truck1.currentMileage, "\nTruck 1 Hours: ", calculateTime(truck1.currentMileage))
+print("Final Delivery: ", truck1.currentTime)
 print("\nTruck 2 Miles: ", truck2.currentMileage, "\nTruck 2 Hours: ", calculateTime(truck2.currentMileage))
+print("Final Delivery: ", truck2.currentTime)
 print("\nTruck 3 Miles: ", truck3.currentMileage, "\nTruck 3 Hours: ", calculateTime(truck3.currentMileage))
-print("\nTotal truck miles: ", round(truck1.currentMileage + truck2.currentMileage + truck3.currentMileage, 2))
+print("Final Delivery: ", truck3.currentTime)
+print("\nTotal truck miles: ", round(truck1.currentMileage + truck2.currentMileage + truck3.currentMileage, 2), "\n")
 
-for i in range(41):
-    print(Package.Get_Package(i, packageTable))
+prLightPurple('-------------------------------------------------------------------------')
+printDeadlines()
+prLightPurple('-------------------------------------------------------------------------')
+checkForDdl()
 
-#print(Package.Get_Package(hashTable., packageTable))
+
