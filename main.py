@@ -18,10 +18,7 @@ def checkForDdl(): #Check for package deadline
                 print("Delivery Time:", str(Package.Get_Package(i, packageTable).deadline))
                 prGreen("Package Deadline Met: (No Deadline Constraint)")  # Ignore packages with no deadline
             else:
-                this = Package.Get_Package(i, packageTable).deadline
-                words = this.split(':')
-                words2 = words[1].split(' ')
-                dline = datetime.timedelta(hours= AMPM(words2[1], int(words[0])), minutes= int(words2[0]))
+                dline = parseStatus(i)
                 print("Deadline:", dline)
                 stat = Package.Get_Package(i, packageTable).deliveryStatus
                 status = stat.split(' ')
@@ -33,6 +30,12 @@ def checkForDdl(): #Check for package deadline
                 else:
                     prGreen("Package Deadline Met")
 
+def parseStatus(PID): #used to parse package deliveryStatus for delivery time
+    this = Package.Get_Package(PID, packageTable).deadline
+    words = this.split(':')
+    words2 = words[1].split(' ')
+    dline = datetime.timedelta(hours=AMPM(words2[1], int(words[0])), minutes=int(words2[0]))
+    return dline
 
 def AMPM(ampm, hour):
     if ampm == 'AM':
@@ -102,6 +105,7 @@ def deliveryalgo(truck, packagelist, dList):
     while len(packagelist) > 0:
         minDist = float(100)
         closest = None
+        farthest = None
         for truck.packagesLoaded in packagelist:
             prCyan("--------------------------------------------------------------------------")
             print("Package:", truck.packagesLoaded.id)
@@ -209,4 +213,37 @@ printDeadlines()
 prLightPurple('-------------------------------------------------------------------------')
 checkForDdl()
 
+def Audit():
+    if YesNo(input("Enter Y to audit\nPress any other key to end Program\n")):
+        AnsYes()
+    else:
+        print("Ending Session, Goodbye!")
+
+
+def YesNo(answer):
+    if (answer == "Y") or (answer == "y") or (answer == "Yes") or (answer == "yes"):
+        return True
+    else:
+        return False
+
+def AnsYes():
+    print("Press 1 to search by package number\nPress 2 to search by time\nPress 3 to return to Main Menu")
+    ans = input()
+    realanswer = False
+    if ans == str("1"):
+        realanswer = True
+        PID = int(input("Please enter Package ID: "))
+        print(packageTable.search(PID).deliveryStatus)
+
+    if ans == str("2"):
+        realanswer = True
+        print('answer 2')
+    if ans == str("3"):
+        realanswer = True
+        print('answer 3')
+        Audit()
+        return
+    if realanswer == False:
+        print('Answer Undefined')
+Audit()
 
