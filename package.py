@@ -15,9 +15,11 @@ class Package:
         self.deliveryStatus = deliveryStatus
 
     def __str__(self):
-        return "%s, %s, %s, %s, %s, %s, %s, %s, %s" % (self.id, self.address, self.deadline,
-                                                   self.city, self.zip, self.weight, self.destId,
-                                                   self.specNotes, self.deliveryStatus)
+        return "ID:%s, Delivery Address:%s, Delivery Deadline:%s\nCity:%s, Zip:%s, Weight:%s," \
+               " Destination ID:%s \nSpecial Notes:%s\nDelivery Status:%s" % \
+               (self.id, self.address, self.deadline,
+                self.city, self.zip, self.weight, self.destId,
+                self.specNotes, self.deliveryStatus)
     def Get_Package(packageID, HashT):
         return HashT.search(packageID)
 

@@ -15,10 +15,10 @@ def checkForDdl(): #Check for package deadline
             print("Package: ", str(Package.Get_Package(i, packageTable).id))
             if Package.Get_Package(i, packageTable).deadline == "EOD":
                 print("Deadline: EOD, No delivery constraint")
-                print("Delivery Time:", str(Package.Get_Package(i, packageTable).deadline))
+                print("Delivery Time:", parseStatus(i))
                 prGreen("Package Deadline Met: (No Deadline Constraint)")  # Ignore packages with no deadline
             else:
-                dline = parseStatus(i)
+                dline = parseDeadline(i)
                 print("Deadline:", dline)
                 stat = Package.Get_Package(i, packageTable).deliveryStatus
                 status = stat.split(' ')
@@ -30,25 +30,33 @@ def checkForDdl(): #Check for package deadline
                 else:
                     prGreen("Package Deadline Met")
 
-def parseStatus(PID): #used to parse package deliveryStatus for delivery time
+def parseDeadline(PID): #used to parse package deadline
     this = Package.Get_Package(PID, packageTable).deadline
     words = this.split(':')
     words2 = words[1].split(' ')
     dline = datetime.timedelta(hours=AMPM(words2[1], int(words[0])), minutes=int(words2[0]))
     return dline
 
-def AMPM(ampm, hour):
+def parseStatus(PID): #used to parse package status for delivery time
+    stat = Package.Get_Package(PID, packageTable).deliveryStatus
+    status = stat.split(' ')
+    deliverytime = status[2].split(":")
+    truedeliverytime = datetime.timedelta(hours=int(deliverytime[0]), minutes=int(deliverytime[1]))
+    return truedeliverytime
+
+def AMPM(ampm, hour): #used in conjunction with parseDeadline to determine 24 hour standard
     if ampm == 'AM':
         return hour
     if ampm == 'PM':
         return hour+12
 
-def Get_Distance(originID, destID, dTable):
+def Get_Distance(originID, destID, dTable): #used to locate distance values using 2 location IDs
     return dTable[originID][destID]
     # dTable is always distanceList in main.py
     # destID is found via Get_DestID above using packageID IE Get_DestID(*packageID*)
     # originID is from the truck object via get_PositionID(*truckID*)
 
+# all below are used to support readability of user interface data
 def prRed(skk): print("\033[91m {}\033[00m" .format(skk))
 def prGreen(skk): print("\033[92m {}\033[00m" .format(skk))
 def prYellow(skk): print("\033[93m {}\033[00m" .format(skk))
@@ -58,7 +66,7 @@ def prCyan(skk): print("\033[96m {}\033[00m" .format(skk))
 def prLightGray(skk): print("\033[97m {}\033[00m" .format(skk))
 def prBlack(skk): print("\033[98m {}\033[00m" .format(skk))
 
-def loadPackageData():
+def loadPackageData(): #used to load packages from csv into memory
     with open('packages.csv') as packageList:
         packageData = csv.reader(packageList, delimiter=',')
         next(packageData)  # skip header
@@ -81,10 +89,10 @@ def loadPackageData():
             # insert it into the hash table
             packageTable.insert(pID, p)
 
-def calculateTime(miles):
+def calculateTime(miles): #used to calculate passage of time via miles per hour
     return round(miles/18, 3)
 
-def printDeadlines():
+def printDeadlines(): #used to display all packages, their deadlines, and their delivery time
     for i in range(41):
         if i > 0:
             if Package.Get_Package(i, packageTable).deadline == "EOD":
@@ -97,11 +105,12 @@ def printDeadlines():
                     Package.Get_Package(i, packageTable).deliveryStatus))
 
 
-def deliveryalgo(truck, packagelist, dList):
+def deliveryalgo(truck, packagelist, dList): #Main algorithm used to determine delivery route and data
     prPurple("Truck: " + str(truck.id))
     prPurple("%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%")
     deliveredPackages = []
-    print("Truck " + str(truck.id) + " Starting Time: " + str(truck.currentTime))
+    truck.startingTime = truck.currentTime
+    print("Truck " + str(truck.id) + " Starting Time: " + str(truck.startingTime))
     while len(packagelist) > 0:
         minDist = float(100)
         closest = None
@@ -183,7 +192,7 @@ truck3 = Truck(3, [
                          packageTable.search(17),
                          packageTable.search(25),
                          packageTable.search(26),
-                         packageTable.search(28),
+                         packageTable.search(28), #Check special notes
                          packageTable.search(31),
                          packageTable.search(32),
                          packageTable.search(33),
@@ -191,6 +200,10 @@ truck3 = Truck(3, [
                          packageTable.search(40)
                          ],
                      0)
+
+truck1.packageHistory = Truck.pckghistory(truck1, truck1.packagesLoaded)
+truck2.packageHistory = Truck.pckghistory(truck2, truck2.packagesLoaded)
+truck3.packageHistory = Truck.pckghistory(truck3, truck3.packagesLoaded)
 
 deliveryalgo(truck1, truck1.packagesLoaded, distanceList)
 
@@ -213,11 +226,59 @@ printDeadlines()
 prLightPurple('-------------------------------------------------------------------------')
 checkForDdl()
 
-def Audit():
-    if YesNo(input("Enter Y to audit\nPress any other key to end Program\n")):
-        AnsYes()
+def timeAudit(PID, TInput):
+    Ptime = parseStatus(PID)
+    if TInput <= datetime.timedelta(hours=8):
+        return "Time: " + str(TInput) + " // Package " + str(PID) + " At the Hub"
+    if Ptime <= TInput:
+        return "Time: " + str(TInput) + " // Package " + str(PID) + ' ' + str(packageTable.search(PID).deliveryStatus)
+    if PID in truck1.packageHistory or PID in truck3.packageHistory:
+        return "Time: " + str(TInput) + " // Package " + str(PID) + " En Route; To be " + str(packageTable.search(PID).deliveryStatus)
+    if PID in truck2.packageHistory:
+        if TInput <= truck2.startingTime:
+            return "Time: " + str(TInput) + " // Package " + str(PID) + " At the Hub"
+        else:
+            return "Time: " + str(TInput) + " // Package " + str(PID) + " En Route; To be " + str(
+                packageTable.search(PID).deliveryStatus)
     else:
-        print("Ending Session, Goodbye!")
+        return "package not found in truck history"
+
+def showAllByTime():
+    x = int(input("Please specify hour(24hr format): "))
+    y = int(input("Please specify minute: "))
+    z = datetime.timedelta(hours=x, minutes=y)
+    for i in range(41):
+        if i > 0:
+            print(timeAudit(i, z))
+
+def Audit():
+    print("\nPress 1 to search by package number\nPress 2 to search all by time\nPress 3 to Exit")
+    ans = input()
+    realanswer = False
+    if ans == str("1"):
+        realanswer = True
+        PID = int(input("Please enter Package ID: "))
+        print(packageTable.search(PID), '\n\nSearch for status at a specific time? (Y/N)')
+        if YesNo(input()):
+            hrs = int(input("Please specify hour(24hr format): "))
+            mins = int(input("Please specify minute: "))
+            print(timeAudit(PID, datetime.timedelta(hours=hrs, minutes=mins)))
+            Audit()
+        else:
+            print("Returning to main menu")
+            Audit()
+
+    if ans == str("2"):
+        realanswer = True
+        showAllByTime()
+        Audit()
+    if ans == str("3"):
+        realanswer = True
+        print('Exiting Program...')
+        return
+    if realanswer == False:
+        print('Answer Undefined')
+        Audit()
 
 
 def YesNo(answer):
@@ -226,24 +287,4 @@ def YesNo(answer):
     else:
         return False
 
-def AnsYes():
-    print("Press 1 to search by package number\nPress 2 to search by time\nPress 3 to return to Main Menu")
-    ans = input()
-    realanswer = False
-    if ans == str("1"):
-        realanswer = True
-        PID = int(input("Please enter Package ID: "))
-        print(packageTable.search(PID).deliveryStatus)
-
-    if ans == str("2"):
-        realanswer = True
-        print('answer 2')
-    if ans == str("3"):
-        realanswer = True
-        print('answer 3')
-        Audit()
-        return
-    if realanswer == False:
-        print('Answer Undefined')
 Audit()
-
