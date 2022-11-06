@@ -1,5 +1,6 @@
 import datetime
 
+
 class Truck:
     def __init__(self, id, packagesLoaded, currentPosition):
         self.id = id
@@ -28,7 +29,6 @@ class Truck:
             TPackageList.append(i.id)
 
         return TPackageList
-
 
     def get_PositionID(self):
         return self.currentPosition

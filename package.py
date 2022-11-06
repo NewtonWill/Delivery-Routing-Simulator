@@ -20,6 +20,7 @@ class Package:
                (self.id, self.address, self.deadline,
                 self.city, self.zip, self.weight, self.destId,
                 self.specNotes, self.deliveryStatus)
+
     def Get_Package(packageID, HashT):
         return HashT.search(packageID)
 

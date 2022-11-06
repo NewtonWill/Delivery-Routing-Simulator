@@ -13,7 +13,7 @@ class ChainingHashTable:
         for i in range(initial_capacity):
             self.table.append([])
 
-    # Inserts a new item into the hash table.
+    # Inserts a new item into the hash table
 
     def insert(self, key, item):  # does both insert and update
         # get the bucket list where this item will go.
@@ -56,29 +56,3 @@ class ChainingHashTable:
             # print (key_value)
             if kv[0] == key:
                 bucket_list.remove([kv[0], kv[1]])
-
-# print("\nInsert:")
-# myHash.insert(bestMovies[0][0], bestMovies[0][1])
-# # 2nd bucket; Key=1, item="CITIZEN KANE - 1941"
-# print(myHash.table)
-# myHash.insert(bestMovies[0][0], bestMovies[9][1])
-# print(myHash.table)
-
-# myHash.insert(bestMovies[10][0], bestMovies[10][1])
-# # 2nd bucket as well; Key=11, item="STAR WARS - 1977"
-# print(myHash.table)
-
-# print("\nSearch:")
-# print(myHash.search(1))  # Key=1, item="CITIZEN KANE - 1941"
-# print(myHash.search(11))  # Key=11, item="STAR WARS - 1977"; so same bucket and Chainin is working
-#
-# print("\nUpdate:")
-# myHash.insert(1, "Star Trek - 1979")  # 2nd bucket; Key=1, item="Star Trek - 1979"
-# print(myHash.table)
-#
-# print("\nRemove:")
-# myHash.remove(1)  # Key=1, item="Star Trek - 1979" to remove
-# print(myHash.table)
-#
-# myHash.remove(11)  # Key=11, item="STAR WARS - 1977" to remove
-# print(myHash.table)
