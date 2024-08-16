@@ -23,7 +23,7 @@
   - Some packages must be delivered before a specified time, the algorithm ensures that any package with such a constraint is given priority and delivered within the directives.
 * Generates detailed reports on specified package or truck upon request, or status of deliveries at a specified time.
 * Determines a route well within project guidelines for efficiency.
-  -Total truck distance traveled is calculated at 89.4 miles, well below the course's 140 mile maximum requirement.
+  - Total truck distance traveled is calculated at 89.4 miles, well below the course's 140 mile maximum requirement.
 * Cross platform
   - Windows, Mac OS, and Linux ready
 
