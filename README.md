@@ -1,42 +1,50 @@
-<h1>DSA-II: Delivery Routing System</h1>
-University project for Data structures and Algorithms course. Algorithm is an
+<h1 align="center">
+  Delivery Routing Simulator
+  <br>
+</h1>
 
-<h2>Purpose:</h2>
-Algorithm to route delivery trucks that will meet all delivery constraints while traveling under 140 miles.
+<h4 align="center">A Python script designed to formulate an optimal logistics route for package delivery </h4>
 
-<h2>Scenario:</h2>
-The Western Governors University Parcel Service (WGUPS) needs to determine an efficient route and delivery distribution for their Daily
-Local Deliveries (DLD) because packages are not currently being consistently delivered by their promised deadline. The Salt Lake City 
-DLD route has three trucks, two drivers, and an average of 40 packages to deliver each day. Each package has specific criteria and delivery 
-requirements. Your task is to determine an algorithm, write code, and present a solution where all 40 packages (listed in the attached
-“WGUPS Package File”) will be delivered on time while meeting each package’s requirements and keeping the combined total distance traveled
-under 140 miles for both trucks. The specific delivery locations are shown on the attached “Salt Lake City Downtown Map,” and distances 
-to each location are given in the attached “WGUPS Distance Table.” The intent is to use the program for this specific location and also 
-for many other cities in each state where WGU has a presence. As such, you will need to include detailed comments to make your code easy 
-to follow and to justify the decisions you made while writing your scripts.Keep in mind that the supervisor should be able to see, at 
-assigned points, the progress of each truck and its packages by any of the variables listed in the “WGUPS Package File,” including what 
-has been delivered and at what time the delivery occurred.
+<p align="center">
+  <a href="#features">Features</a> •
+  <a href="#constraints">Constraints</a> •
+  <a href="#links">Links</a>
+</p>
 
-<h2>Assumptions:</h2>
-•Each truck can carry a maximum of 16 packages, and the ID number of each package is unique.
+<p> Delivery Routing Simulator was designed to satisfy curriculum requirements in my computer science degree program.</p> 
+<p>The algorithm's purpose is to route delivery trucks in a reasonably optimal path, record delivery times and distances traveled, and meet all other specified constraints.</p>
+<p>Delivery Routing Simulator is not currently under active development</p>
 
-•The trucks travel at an average speed of 18 miles per hour and have an infinite amount of gas with no need to stop.
 
-•There are no collisions.
+## Features
+* Determines and records travel path, total distance traveled, and delivery times for 3 trucks delivering packages simultaneously.
+  - Distances between addresses are provided by a reference table, and time is calculated with an assumed average 18 miles per hour.
+* Ensures all packages meet their specified delivery deadline.
+  - Some packages must be delivered before a specified time, the algorithm ensures that any package with such a constraint is given priority and delivered within the directives.
+* Generates detailed reports on specified package or truck upon request, or status of deliveries at a specified time.
+* Determines a route well within project guidelines for efficiency.
+  -Total truck distance traveled is calculated at 89.4 miles, well below the course's 140 mile maximum requirement.
+* Cross platform
+  - Windows, Mac OS, and Linux ready
 
-•Three trucks and two drivers are available for deliveries. Each driver stays with the same truck as long as that truck is in service.
+ 
+## Constraints
 
-•Drivers leave the hub no earlier than 8:00 a.m., with the truck loaded, and can return to the hub for packages if needed. 
+* Each truck can carry a maximum of 16 packages.
+* Trucks travel at an average speed of 18 miles per hour with no need to stop.
+* Total truck travel distance must not be more than 140 miles.
+  - (Delivery Routing Simulator determined an actual total of 89.4 total miles)
+* Three trucks and two drivers are available for deliveries.
+  - A driver may board another truck and commence deliveries once returning to the hub with their first truck.
+* Drivers leave the hub no earlier than 8:00 a.m., with the truck loaded, and can return to the hub for packages if needed.
+* The delivery and loading times are instantaneous, i.e., no time passes while at a delivery or when moving packages to a truck at the hub.
+* The delivery address for package #9, Third District Juvenile Court, is wrong and will be corrected at 10:20 a.m. the company is aware that
+  the address is incorrect and will be updated to the correct destination at 10:20 a.m.
+* The distances provided in the distance table are equal regardless of the direction traveled.
 
-•The delivery and loading times are instantaneous, i.e., no time passes while at a delivery or when moving packages to a truck at the
-  hub (that time is factored into the calculation of the average speed of the trucks).
-  
-•There is up to one special note associated with a package.
 
-•The delivery address for package #9, Third District Juvenile Court, is wrong and will be corrected at 10:20 a.m. WGUPS is aware that
-  the address is incorrect and will be updated at 10:20 a.m. However, WGUPS does not know the correct address (410 S State St., 
-  Salt Lake City, UT 84111) until 10:20 a.m.
-  
-•The distances provided in the WGUPS Distance Table are equal regardless of the direction traveled.
+## Links
 
-•The day ends when all 40 packages have been delivered.
+> [NewtonWill.github.io](https://www.NewtonWill.github.io) &nbsp;&middot;&nbsp;
+> GitHub [@NewtonWill](https://github.com/NewtonWill) &nbsp;&middot;&nbsp;
+> LinkedIn [William Newton](https://www.linkedin.com/in/william-newton-6203011b9/)
